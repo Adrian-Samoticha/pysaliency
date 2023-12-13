@@ -270,7 +270,7 @@ def get_mit1003(location=None):
     return _get_mit1003('MIT1003', location=location, include_initial_fixation=False)
 
 
-def get_mit1003_with_initial_fixation(location=None):
+def get_mit1003_with_initial_fixation(location=None, replace_initial_invalid_fixations=False):
     """
     Loads or downloads and caches the MIT1003 dataset. The dataset
     consists of 1003 natural indoor and outdoor scenes of
@@ -303,7 +303,7 @@ def get_mit1003_with_initial_fixation(location=None):
 
         http://people.csail.mit.edu/tjudd/WherePeopleLook/index.html
     """
-    return _get_mit1003('MIT1003_initial_fix', location=location, include_initial_fixation=True)
+    return _get_mit1003('MIT1003_initial_fix', location=location, include_initial_fixation=True, replace_initial_invalid_fixations=replace_initial_invalid_fixations)
 
 
 def get_mit1003_onesize(location=None):
