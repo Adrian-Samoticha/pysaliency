@@ -19,7 +19,7 @@ from .utils import create_stimuli, _load
 
 
 
-def get_SALICON(edition='2015', fixation_type='mouse', location=None):
+def get_SALICON(edition='2015', fixation_type='mouse', location=None, max_samples=None):
     """
     Loads or downloads and caches the SALICON dataset as used in the LSUN challenge prior to 2017.
     For memory reasons no fixation trains  are provided.
@@ -56,9 +56,9 @@ def get_SALICON(edition='2015', fixation_type='mouse', location=None):
     name = _get_SALICON_name(edition=edition, fixation_type=fixation_type)
 
     stimuli_train, stimuli_val, stimuli_test = _get_SALICON_stimuli(
-        location=location, name='SALICON', edition=edition, fixation_type=fixation_type)
+        location=location, name='SALICON', edition=edition, fixation_type=fixation_type, max_samples=max_samples)
     fixations_train, fixations_val = _get_SALICON_fixations(
-        location=location, name=name, edition=edition, fixation_type=fixation_type)
+        location=location, name=name, edition=edition, fixation_type=fixation_type, max_samples=max_samples)
 
     return stimuli_train, stimuli_val, stimuli_test, fixations_train, fixations_val
 
@@ -84,7 +84,7 @@ def _get_SALICON_name(edition='2015', fixation_type='mouse'):
     return name
 
 
-def _get_SALICON_stimuli(location, name, edition='2015', fixation_type='mouse'):
+def _get_SALICON_stimuli(location, name, edition='2015', fixation_type='mouse', max_samples=None):
     if edition not in ['2015', '2017']:
         raise ValueError('edition has to be \'2015\' or \'2017\', not \'{}\''.format(edition))
 
@@ -115,19 +115,19 @@ def _get_SALICON_stimuli(location, name, edition='2015', fixation_type='mouse'):
 
             stimuli_train = create_stimuli(
                 stimuli_location=os.path.join(temp_dir, 'images', 'train'),
-                filenames=[os.path.basename(f) for f in sorted(glob.glob(os.path.join(temp_dir, 'images', 'train', 'COCO_train*')))],
+                filenames=[os.path.basename(f) for f in sorted(glob.glob(os.path.join(temp_dir, 'images', 'train', 'COCO_train*')))][:max_samples],
                 location=os.path.join(location, 'stimuli', 'train') if location else None
             )
 
             stimuli_val = create_stimuli(
                 stimuli_location=os.path.join(temp_dir, 'images', 'val'),
-                filenames=[os.path.basename(f) for f in sorted(glob.glob(os.path.join(temp_dir, 'images', 'val', 'COCO_val*')))],
+                filenames=[os.path.basename(f) for f in sorted(glob.glob(os.path.join(temp_dir, 'images', 'val', 'COCO_val*')))][:max_samples],
                 location=os.path.join(location, 'stimuli', 'val') if location else None
             )
 
             stimuli_test = create_stimuli(
                 stimuli_location=os.path.join(temp_dir, 'images', 'test'),
-                filenames=[os.path.basename(f) for f in sorted(glob.glob(os.path.join(temp_dir, 'images', 'test', 'COCO_test*')))],
+                filenames=[os.path.basename(f) for f in sorted(glob.glob(os.path.join(temp_dir, 'images', 'test', 'COCO_test*')))][:max_samples],
                 location=os.path.join(location, 'stimuli', 'test') if location else None
             )
 
@@ -139,7 +139,7 @@ def _get_SALICON_stimuli(location, name, edition='2015', fixation_type='mouse'):
     return stimuli_train, stimuli_val, stimuli_test
 
 
-def _get_SALICON_fixations(location, name, edition='2015', fixation_type='mouse'):
+def _get_SALICON_fixations(location, name, edition='2015', fixation_type='mouse', max_samples=None):
     if edition not in ['2015', '2017']:
         raise ValueError('edition has to be \'2015\' or \'2017\', not \'{}\''.format(edition))
 
@@ -185,7 +185,7 @@ def _get_SALICON_fixations(location, name, edition='2015', fixation_type='mouse'
 
                 subject_id = 0
 
-                data_files = list(sorted(glob.glob(os.path.join(temp_dir, 'fixations', dataset, '*.mat'))))
+                data_files = list(sorted(glob.glob(os.path.join(temp_dir, 'fixations', dataset, '*.mat'))))[:max_samples]
                 for n, filename in enumerate(tqdm(data_files)):
                     fixation_data = loadmat(filename)
                     for subject_data in fixation_data['gaze'].flatten():
@@ -221,7 +221,7 @@ def _get_SALICON_fixations(location, name, edition='2015', fixation_type='mouse'
         return fixations_train, fixations_val
 
 
-def get_SALICON_train(edition='2015', fixation_type='mouse', location=None):
+def get_SALICON_train(edition='2015', fixation_type='mouse', location=None, max_samples=None):
     """
     Loads or downloads and caches the SALICON training dataset. See `get_SALICON` for more details.
     """
@@ -231,12 +231,12 @@ def get_SALICON_train(edition='2015', fixation_type='mouse', location=None):
             stimuli = _load(os.path.join(location, 'SALICON', 'stimuli_train.hdf5'))
             fixations = _load(os.path.join(location, name, 'fixations_train.hdf5'))
             return stimuli, fixations
-    stimuli_train, _, _, fixations_train, _ = get_SALICON(location=location, edition=edition, fixation_type=fixation_type)
+    stimuli_train, _, _, fixations_train, _ = get_SALICON(location=location, edition=edition, fixation_type=fixation_type, max_samples=max_samples)
 
     return stimuli_train, fixations_train
 
 
-def get_SALICON_val(edition='2015', fixation_type='mouse', location=None):
+def get_SALICON_val(edition='2015', fixation_type='mouse', location=None, max_samples=None):
     """
     Loads or downloads and caches the SALICON validation dataset. See `get_SALICON` for more details.
     """
@@ -246,7 +246,7 @@ def get_SALICON_val(edition='2015', fixation_type='mouse', location=None):
             stimuli = _load(os.path.join(location, 'SALICON', 'stimuli_val.hdf5'))
             fixations = _load(os.path.join(location, name, 'fixations_val.hdf5'))
             return stimuli, fixations
-    _, stimuli_val, _, _, fixations_val = get_SALICON(location=location, edition=edition, fixation_type=fixation_type)
+    _, stimuli_val, _, _, fixations_val = get_SALICON(location=location, edition=edition, fixation_type=fixation_type, max_samples=max_samples)
 
     return stimuli_val, fixations_val
 
