@@ -22,7 +22,7 @@ from ..utils import (
 from .utils import create_stimuli, _load
 
 
-def _get_mit1003(dataset_name, location=None, include_initial_fixation=False, only_1024_by_768=False, replace_initial_invalid_fixations=False):
+def _get_mit1003(dataset_name, location=None, include_initial_fixation=False, only_1024_by_768=False, replace_initial_invalid_fixations=False, max_num_stimuli=None):
     """
     .. seealso::
 
@@ -65,6 +65,9 @@ def _get_mit1003(dataset_name, location=None, include_initial_fixation=False, on
             stimuli_src_location = os.path.join(temp_dir, 'ALLSTIMULI')
             stimuli_target_location = os.path.join(location, 'stimuli') if location else None
             images = glob.glob(os.path.join(stimuli_src_location, '*.jpeg'))
+            if max_num_stimuli:
+                images = images[:max_num_stimuli]
+                print('Only using the first {} images: {}'.format(max_num_stimuli, images))
             images = [os.path.split(img)[1] for img in images]
             stimuli_filenames = natsorted(images)
 
@@ -270,7 +273,7 @@ def get_mit1003(location=None):
     return _get_mit1003('MIT1003', location=location, include_initial_fixation=False)
 
 
-def get_mit1003_with_initial_fixation(location=None, replace_initial_invalid_fixations=False):
+def get_mit1003_with_initial_fixation(location=None, replace_initial_invalid_fixations=False, max_num_stimuli=None):
     """
     Loads or downloads and caches the MIT1003 dataset. The dataset
     consists of 1003 natural indoor and outdoor scenes of
@@ -303,7 +306,7 @@ def get_mit1003_with_initial_fixation(location=None, replace_initial_invalid_fix
 
         http://people.csail.mit.edu/tjudd/WherePeopleLook/index.html
     """
-    return _get_mit1003('MIT1003_initial_fix', location=location, include_initial_fixation=True, replace_initial_invalid_fixations=replace_initial_invalid_fixations)
+    return _get_mit1003('MIT1003_initial_fix', location=location, include_initial_fixation=True, replace_initial_invalid_fixations=replace_initial_invalid_fixations, max_num_stimuli=max_num_stimuli)
 
 
 def get_mit1003_onesize(location=None):
